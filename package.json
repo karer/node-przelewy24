@@ -1,0 +1,21 @@
+{
+  "name": "node-przelewy24",
+  "version": "1.0.0",
+  "description": "Wrapper to use Przelewy24 API within ES6 NodeJS",
+  "main": "przelewy24.mjs",
+  "keywords": [
+    "przelewy24",
+    "payments",
+    "gateway",
+    "node",
+    "nodejs",
+    "transfers"
+  ],
+  "author": "Kacper Geisheimer <devkarer@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "query-string": "^5.0.1",
+    "request": "^2.83.0",
+    "request-promise-native": "^1.0.5"
+  }
+}
