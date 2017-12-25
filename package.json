@@ -17,5 +17,9 @@
     "query-string": "^5.0.1",
     "request": "^2.83.0",
     "request-promise-native": "^1.0.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/karer/node-przelewy24"
   }
 }
