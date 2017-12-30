@@ -17,16 +17,17 @@ Example: `node --experimental-modules index.mjs`
 import Przelewy24 from 'node-przelewy24'
 
 async function createPayment() {
-    const P24 = new Przelewy24('CLIENT_ID', 'CLIENT_ID', 'CLIENT_CRC', false)
+    const P24 = new Przelewy24('MERCHANT_ID', 'POS_ID', 'SALT', false)
 
     // Set obligatory data
     P24.setSessionId('nodeapitest1')
     P24.setAmount(5.50 * 100)
     P24.setCurrency('PLN')
     P24.setDescription('Simple payment.')
-    P24.setEmail('test@test.pl')
+    P24.setEmail('test@gmail.com')
     P24.setCountry('PL')
-    P24.setUrlReturn('https://google.pl/')
+    P24.setUrlStatus('https://myshop.com/api/v1/store/callback_p24')
+    P24.setUrlReturn('https://myshop.com')
     
     // What about adding some products?
     P24.addProduct('Product no.1', 'Product description', 1, 1.20 * 100)
@@ -47,28 +48,32 @@ async function createPayment() {
 createPayment()
 ```
 
-### Verifying order status update
+### Verifying order status update (callback)
 ```
 import Przelewy24 from 'node-przelewy24'
 
-async function checkPayment() {
-    const P24 = new Przelewy24('CLIENT_ID', 'CLIENT_ID', 'CLIENT_CRC', false)
+const P24_TRUST_IPS = ['91.216.191.181', '91.216.191.182', '91.216.191.183', '91.216.191.184', '91.216.191.185']
 
-    // Set obligatory data
-    P24.setSessionId('nodeapitest1')
-    P24.setAmount(5.50 * 100)
-    P24.setCurrency('PLN')
-    P24.setOrderId('order-id-from-p24-status-update')
+const callbackP24 = async (req, res, next) => {
+    if (P24_TRUST_IPS.indexOf(req.headers['x-real-ip']) === -1) {
+        return next(new Error('Unauthorized IP address'))
+    }
 
-    // Verify our order
+    const { p24_session_id, p24_amount, p24_currency, p24_order_id, p24_sign } = req.body
+
+    const P24 = new Przelewy24('MERCHANT_ID', 'POS_ID', 'SALT', false)
+
+    P24.setSessionId(p24_session_id)
+    P24.setAmount(p24_amount)
+    P24.setCurrency(p24_currency)
+    P24.setOrderId(p24_order_id)
+
     try {
-        await P24.verify()
+        await P24.verify(p24_sign)
 
-        console.log('Paid')
+        return res.send('OK')
     } catch (e) {
-        console.log(e.message)
+        return next(e)
     }
 }
-
-checkPayment()
 ```

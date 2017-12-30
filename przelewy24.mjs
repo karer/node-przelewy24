@@ -255,7 +255,7 @@ export default class Przelewy24 {
         return this.host + 'trnRequest/' + token
     }
 
-    verify() {
+    verify(sign) {
         return new Promise(async (resolve, reject) => {
             for (const field of this.REQUIRED_FIELDS_VERIFY) {
                 if (this.form[field] === undefined) {
@@ -263,7 +263,7 @@ export default class Przelewy24 {
                 }
             }
 
-            this.form.p24_sign = this.getCrc()
+            this.form.p24_sign = sign
 
             try {
                 const rawResponse = await request.post(this.host + "trnVerify", { form: this.form })
